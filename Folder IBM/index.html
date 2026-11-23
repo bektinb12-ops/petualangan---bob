@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Petualangan BOB 🤖</title>
+
+  <!-- ============================================================
+       PETUALANGAN BOB — Game Edukasi Anak Usia 3-8 Tahun
+       Single HTML · Inline CSS · Inline JS · Zero Dependencies
+       ============================================================ -->
+
+  <style>
+    /* ── CSS CUSTOM PROPERTIES (TEMA CERIA) ─────────────────────── */
+    :root {
+      --yellow:   #FFE066;
+      --sky:      #7EC8E3;
+      --pink:     #FFB3D9;
+      --green:    #B5EAD7;
+      --orange:   #FFCBA4;
+      --purple:   #C9B1FF;
+      --white:    #FFFFFF;
+      --dark:     #2D2D2D;
+      --shadow:   rgba(0,0,0,0.15);
+      --radius:   24px;
+      --font:     'Segoe UI', 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif;
+    }
+
+    /* ── RESET & BASE ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: linear-gradient(135deg, #FFF9C4 0%, #E0F7FA 50%, #FCE4EC 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── SCREEN SYSTEM ──────────────────────────────────────────── */
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+      padding: 20px 16px 32px;
+      min-height: 100vh;
+      position: relative;
+      animation: fadeIn 0.4s ease;
+    }
+    .screen.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── BOB CHARACTER ──────────────────────────────────────────── */
+    .bob {
+      font-size: clamp(72px, 18vw, 110px);
+      animation: bobFloat 2.4s ease-in-out infinite;
+      line-height: 1;
+      filter: drop-shadow(0 6px 12px var(--shadow));
+    }
+    @keyframes bobFloat {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50%       { transform: translateY(-14px) rotate(3deg); }
+    }
+
+    /* ── SPEECH BUBBLE ──────────────────────────────────────────── */
+    .bubble {
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 800;
+      color: var(--dark);
+      text-align: center;
+      max-width: 90%;
+      position: relative;
+      margin-top: 10px;
+      box-shadow: 4px 4px 0 var(--dark);
+    }
+    .bubble::before {
+      content: '';
+      position: absolute;
+      top: -18px; left: 30px;
+      border: 10px solid transparent;
+      border-bottom-color: var(--dark);
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      top: -13px; left: 32px;
+      border: 8px solid transparent;
+      border-bottom-color: var(--white);
+    }
+
+    /* ── TYPOGRAPHY ─────────────────────────────────────────────── */
+    h1 {
+      font-size: clamp(32px, 10vw, 56px);
+      font-weight: 900;
+      color: var(--dark);
+      text-align: center;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+      line-height: 1.1;
+      letter-spacing: 1px;
+    }
+    h2 {
+      font-size: clamp(22px, 6vw, 34px);
+      font-weight: 900;
+      color: var(--dark);
+      text-align: center;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .subtitle {
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 700;
+      color: #555;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-width: 180px;
+      min-height: 80px;
+      padding: 14px 28px;
+      font-family: var(--font);
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--dark);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      cursor: pointer;
+      box-shadow: 5px 5px 0 var(--dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      outline: none;
+      background: var(--yellow);
+    }
+    .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 var(--dark);
+    }
+    .btn-sky    { background: var(--sky); }
+    .btn-pink   { background: var(--pink); }
+    .btn-green  { background: var(--green); }
+    .btn-purple { background: var(--purple); }
+    .btn-orange { background: var(--orange); }
+    .btn-start  { min-width: 240px; min-height: 100px; font-size: clamp(22px, 6vw, 32px); background: var(--yellow); }
+
+    /* ── GAME MODE CARDS ────────────────────────────────────────── */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .mode-card {
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 var(--dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .mode-card:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--dark); }
+    .mode-icon { font-size: 48px; flex-shrink: 0; }
+    .mode-info h3 { font-size: clamp(18px, 5vw, 22px); font-weight: 900; color: var(--dark); }
+    .mode-info p  { font-size: clamp(12px, 3.5vw, 15px); font-weight: 700; color: #666; margin-top: 2px; }
+
+    /* ── SCORE BAR ──────────────────────────────────────────────── */
+    .score-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      margin-bottom: 16px;
+      box-shadow: 4px 4px 0 var(--dark);
+    }
+    .score-stars { font-size: clamp(18px, 5vw, 24px); font-weight: 900; }
+    .score-round { font-size: clamp(14px, 4vw, 18px); font-weight: 800; color: #555; }
+
+    /* ── QUESTION AREA ──────────────────────────────────────────── */
+    .question-card {
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 5px 5px 0 var(--dark);
+      margin-bottom: 20px;
+    }
+    .q-emoji { font-size: clamp(72px, 20vw, 110px); line-height: 1.1; }
+    .q-label { font-size: clamp(16px, 5vw, 22px); font-weight: 900; color: var(--dark); margin-top: 6px; }
+    .q-instruction {
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 800;
+      color: #333;
+      background: var(--yellow);
+      border-radius: 12px;
+      padding: 8px 16px;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    /* ── ANSWER CHOICES ─────────────────────────────────────────── */
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      width: 100%;
+    }
+    .choice-btn {
+      min-width: 90px;
+      min-height: 90px;
+      font-size: clamp(28px, 9vw, 42px);
+      font-weight: 900;
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      cursor: pointer;
+      box-shadow: 5px 5px 0 var(--dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      outline: none;
+    }
+    .choice-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--dark); }
+    .choice-btn.correct {
+      background: var(--green);
+      border-color: #27ae60;
+      animation: popIn 0.4s ease;
+    }
+    .choice-btn.wrong {
+      animation: shake 0.5s ease;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    /* ── COLOR BALLOON GRID ─────────────────────────────────────── */
+    .balloon-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      width: 100%;
+    }
+    .balloon-btn {
+      width: 90px;
+      height: 110px;
+      border: 3px solid var(--dark);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--dark);
+      position: relative;
+      transition: transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(14px, 3.5vw, 16px);
+      font-weight: 900;
+      color: rgba(0,0,0,0.6);
+      flex-direction: column;
+      outline: none;
+      padding-bottom: 20px;
+    }
+    .balloon-btn::after {
+      content: '🎈';
+      position: absolute;
+      bottom: -24px;
+      font-size: 18px;
+    }
+    .balloon-btn:active { transform: scale(0.93); }
+    .balloon-btn.correct { animation: popIn 0.4s ease; border-color: #27ae60; box-shadow: 4px 4px 0 #27ae60; }
+    .balloon-btn.wrong   { animation: shake 0.5s ease; }
+
+    /* ── FEEDBACK OVERLAY ───────────────────────────────────────── */
+    .feedback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .feedback.show { display: flex; }
+    .feedback-box {
+      background: var(--white);
+      border: 4px solid var(--dark);
+      border-radius: 32px;
+      padding: 28px 40px;
+      text-align: center;
+      box-shadow: 8px 8px 0 var(--dark);
+      animation: popIn 0.5s ease;
+      pointer-events: auto;
+    }
+    .feedback-emoji { font-size: clamp(56px, 16vw, 88px); }
+    .feedback-text  { font-size: clamp(22px, 7vw, 36px); font-weight: 900; color: var(--dark); margin-top: 8px; }
+    .feedback-sub   { font-size: clamp(14px, 4vw, 20px); font-weight: 700; color: #555; margin-top: 4px; }
+
+    /* ── CONFETTI ───────────────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    /* ── MUTE BUTTON ────────────────────────────────────────────── */
+    .mute-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 100;
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+      outline: none;
+    }
+    .mute-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--dark); }
+
+    /* ── BACK BUTTON ────────────────────────────────────────────── */
+    .back-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 100;
+      background: var(--white);
+      border: 3px solid var(--dark);
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+      outline: none;
+    }
+    .back-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--dark); }
+    .back-btn.hidden { display: none; }
+
+    /* ── END SCREEN ─────────────────────────────────────────────── */
+    .star-display {
+      font-size: clamp(40px, 12vw, 64px);
+      text-align: center;
+      margin: 10px 0;
+      letter-spacing: 4px;
+    }
+    .total-stars-box {
+      background: var(--yellow);
+      border: 3px solid var(--dark);
+      border-radius: var(--radius);
+      padding: 14px 32px;
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 900;
+      color: var(--dark);
+      box-shadow: 5px 5px 0 var(--dark);
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    /* ── PROGRESS DOTS ──────────────────────────────────────────── */
+    .progress-dots {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ddd;
+      border: 2px solid #aaa;
+      transition: background 0.3s;
+    }
+    .dot.done        { background: var(--yellow); border-color: var(--dark); }
+    .dot.correct-dot { background: #B5EAD7; border-color: #27ae60; }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .choice-btn  { min-width: 76px; min-height: 76px; }
+      .balloon-btn { width: 76px; height: 92px; }
+    }
+    @media (min-width: 601px) {
+      .mode-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CONFETTI CANVAS
+══════════════════════════════════════════════════════════════ -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PERSISTENT UI: MUTE + BACK BUTTONS
+══════════════════════════════════════════════════════════════ -->
+<button class="mute-btn" id="muteBtn" title="Suara On/Off" aria-label="Mute">🔊</button>
+<button class="back-btn hidden" id="backBtn" title="Kembali" aria-label="Kembali">◀</button>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FEEDBACK OVERLAY
+══════════════════════════════════════════════════════════════ -->
+<div class="feedback" id="feedbackOverlay">
+  <div class="feedback-box" id="feedbackBox">
+    <div class="feedback-emoji" id="feedbackEmoji">🌟</div>
+    <div class="feedback-text"  id="feedbackText">PINTAR SEKALI!</div>
+    <div class="feedback-sub"   id="feedbackSub">+1 ⭐ BINTANG</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 1 — START SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screenStart">
+  <div class="bob">🤖</div>
+  <div class="bubble">HAI! AKU BOB! YUKK BELAJAR BARENG! 🎉</div>
+  <h1 style="margin-top:24px;">PETUALANGAN<br>BOB</h1>
+  <p class="subtitle">BELAJAR HURUF, ANGKA &amp; WARNA</p>
+  <div style="margin-top:32px; display:flex; flex-direction:column; align-items:center; gap:14px;">
+    <button class="btn btn-start" id="btnStart">▶ MULAI MAIN!</button>
+    <div class="total-stars-box" id="startTotalStars">⭐ TOTAL BINTANGKU: 0</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 2 — PILIH GAME
+══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenSelect">
+  <div class="bob" style="font-size:clamp(48px,12vw,72px)">🤖</div>
+  <div class="bubble">MAU BELAJAR APA HARI INI?</div>
+  <div class="mode-grid" style="margin-top:20px;">
+    <div class="mode-card" id="modeLetters" style="background:#FFF9C4;">
+      <div class="mode-icon">🔤</div>
+      <div class="mode-info">
+        <h3>TEBAK HURUF</h3>
+        <p>TEBAK HURUF PERTAMA DARI GAMBAR</p>
+      </div>
+    </div>
+    <div class="mode-card" id="modeNumbers" style="background:#E0F7FA;">
+      <div class="mode-icon">🔢</div>
+      <div class="mode-info">
+        <h3>TEBAK ANGKA</h3>
+        <p>HITUNG DAN TEBAK JUMLAHNYA</p>
+      </div>
+    </div>
+    <div class="mode-card" id="modeColors" style="background:#FCE4EC;">
+      <div class="mode-icon">🎨</div>
+      <div class="mode-info">
+        <h3>TEBAK WARNA</h3>
+        <p>KLIK BALON DENGAN WARNA YANG BENAR</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 3 — GAME AREA
+══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenGame">
+  <div class="score-bar">
+    <div class="score-stars" id="scoreStars">⭐ 0</div>
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="score-round"  id="scoreRound">1 / 5</div>
+  </div>
+  <div class="bob" style="font-size:clamp(44px,11vw,68px); animation-duration:2s;">🤖</div>
+  <div class="bubble" id="bobSays">YUKK COBA!</div>
+  <div class="question-card" id="questionCard">
+    <div class="q-emoji"       id="qEmoji">🍎</div>
+    <div class="q-label"       id="qLabel"></div>
+    <div class="q-instruction" id="qInstruction"></div>
+  </div>
+  <div class="choices" id="choicesArea"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 4 — END / KAMU HEBAT!
+══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenEnd">
+  <div class="bob">🤖</div>
+  <div class="bubble" id="endBubble">WAAAAH KAMU HEBAT BANGET! 🎉</div>
+  <h1 style="margin-top:16px;">KAMU HEBAT! 🏆</h1>
+  <div class="star-display"   id="endStars">⭐⭐⭐</div>
+  <div class="total-stars-box" id="endTotalStars">⭐ TOTAL BINTANG: 0</div>
+  <div style="margin-top:24px; display:flex; flex-direction:column; gap:14px; align-items:center; width:100%;">
+    <button class="btn btn-start btn-green" id="btnPlayAgain">🔄 MAIN LAGI!</button>
+    <button class="btn btn-sky"             id="btnMenu">🏠 MENU UTAMA</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT GAME ENGINE
+══════════════════════════════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 1: GLOBAL STATE
+═══════════════════════════════════════════════════════════════ */
+var State = {
+  muted:        false,
+  totalStars:   0,
+  sessionStars: 0,
+  currentMode:  null,   // 'letters' | 'numbers' | 'colors'
+  round:        0,
+  totalRounds:  5,
+  questions:    [],
+  currentQ:     null,
+  answering:    true,
+  roundResults: []
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 2: LOCALSTORAGE
+═══════════════════════════════════════════════════════════════ */
+function loadStars() {
+  State.totalStars = parseInt(localStorage.getItem('bobStars') || '0', 10);
+}
+function saveStars() {
+  localStorage.setItem('bobStars', String(State.totalStars));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 3: WEB AUDIO API — SOUND EFFECTS
+═══════════════════════════════════════════════════════════════ */
+var audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, gainVal) {
+  if (State.muted) return;
+  type    = type    || 'sine';
+  gainVal = gainVal || 0.35;
+  try {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var osc  = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.01);
+  } catch(e) {}
+}
+
+/* Happy ascending "Yeay!" fanfare */
+function soundCorrect() {
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(f, i) {
+    setTimeout(function() { playTone(f, 0.25, 'triangle', 0.35); }, i * 110);
+  });
+}
+
+/* Soft gentle "Coba lagi" descending */
+function soundWrong() {
+  playTone(330, 0.14, 'sine', 0.22);
+  setTimeout(function() { playTone(294, 0.18, 'sine', 0.18); }, 160);
+}
+
+/* Click bip */
+function soundClick() {
+  playTone(660, 0.07, 'triangle', 0.18);
+}
+
+/* Victory jingle on end screen */
+function soundEnd() {
+  var fanfare = [523, 587, 659, 784, 659, 784, 1047];
+  fanfare.forEach(function(f, i) {
+    setTimeout(function() { playTone(f, 0.2, 'triangle', 0.3); }, i * 130);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 4: CONFETTI
+═══════════════════════════════════════════════════════════════ */
+var confettiCanvas  = document.getElementById('confetti-canvas');
+var confettiCtx     = confettiCanvas.getContext('2d');
+var confettiPieces  = [];
+var confettiRunning = false;
+var CONFETTI_COLORS = ['#FFE066','#7EC8E3','#FFB3D9','#B5EAD7','#FFCBA4','#C9B1FF','#FF6B6B','#FFD93D'];
+
+function launchConfetti() {
+  confettiCanvas.width  = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  confettiPieces = [];
+  for (var i = 0; i < 110; i++) {
+    confettiPieces.push({
+      x:     Math.random() * confettiCanvas.width,
+      y:     -20 - Math.random() * 80,
+      w:     8  + Math.random() * 10,
+      h:     12 + Math.random() * 10,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      vx:    (Math.random() - 0.5) * 4,
+      vy:    3 + Math.random() * 4,
+      angle: Math.random() * 360,
+      spin:  (Math.random() - 0.5) * 8
+    });
+  }
+  confettiRunning = true;
+  animateConfetti();
+}
+
+function animateConfetti() {
+  if (!confettiRunning) return;
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  var alive = false;
+  confettiPieces.forEach(function(p) {
+    p.x     += p.vx;
+    p.y     += p.vy;
+    p.angle += p.spin;
+    if (p.y < confettiCanvas.height + 20) alive = true;
+    var alpha = Math.max(0, 1 - p.y / (confettiCanvas.height * 1.1));
+    confettiCtx.save();
+    confettiCtx.globalAlpha = alpha;
+    confettiCtx.translate(p.x, p.y);
+    confettiCtx.rotate(p.angle * Math.PI / 180);
+    confettiCtx.fillStyle = p.color;
+    confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    confettiCtx.restore();
+  });
+  if (alive) {
+    requestAnimationFrame(animateConfetti);
+  } else {
+    confettiRunning = false;
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 5: SCREEN NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  var backBtn = document.getElementById('backBtn');
+  if (id === 'screenStart' || id === 'screenEnd') {
+    backBtn.classList.add('hidden');
+  } else {
+    backBtn.classList.remove('hidden');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 6: QUESTION DATA BANKS
+═══════════════════════════════════════════════════════════════ */
+
+/* --- TEBAK HURUF --- */
+var LETTER_DATA = [
+  { emoji: '🍎', label: 'APEL',     answer: 'A', choices: ['A','B','C'] },
+  { emoji: '🐟', label: 'IKAN',     answer: 'I', choices: ['I','O','U'] },
+  { emoji: '🐘', label: 'GAJAH',    answer: 'G', choices: ['G','H','K'] },
+  { emoji: '🦁', label: 'SINGA',    answer: 'S', choices: ['S','T','P'] },
+  { emoji: '🐒', label: 'MONYET',   answer: 'M', choices: ['M','N','L'] },
+  { emoji: '🏠', label: 'RUMAH',    answer: 'R', choices: ['R','S','T'] },
+  { emoji: '🌸', label: 'BUNGA',    answer: 'B', choices: ['B','D','F'] },
+  { emoji: '🐦', label: 'BURUNG',   answer: 'B', choices: ['B','P','K'] },
+  { emoji: '🍌', label: 'PISANG',   answer: 'P', choices: ['P','Q','R'] },
+  { emoji: '🐱', label: 'KUCING',   answer: 'K', choices: ['K','G','J'] },
+  { emoji: '🌈', label: 'PELANGI',  answer: 'P', choices: ['P','F','W'] },
+  { emoji: '🐊', label: 'BUAYA',    answer: 'B', choices: ['B','C','D'] },
+];
+
+/* --- TEBAK ANGKA --- */
+var NUMBER_DATA = [
+  { count: 1, emoji: '⭐',  label: 'BINTANG',    choices: [1, 2, 3] },
+  { count: 2, emoji: '🌸',  label: 'BUNGA',       choices: [1, 2, 3] },
+  { count: 3, emoji: '🍎',  label: 'APEL',        choices: [2, 3, 4] },
+  { count: 4, emoji: '🦋',  label: 'KUPU-KUPU',   choices: [3, 4, 5] },
+  { count: 5, emoji: '🐟',  label: 'IKAN',        choices: [4, 5, 6] },
+  { count: 2, emoji: '🐥',  label: 'ANAK AYAM',   choices: [1, 2, 3] },
+  { count: 3, emoji: '🌙',  label: 'BULAN',       choices: [2, 3, 4] },
+  { count: 4, emoji: '🍊',  label: 'JERUK',       choices: [3, 4, 5] },
+  { count: 5, emoji: '⚽',  label: 'BOLA',        choices: [4, 5, 6] },
+  { count: 1, emoji: '🌞',  label: 'MATAHARI',    choices: [1, 2, 3] },
+];
+
+/* --- TEBAK WARNA --- */
+var ALL_COLORS = [
+  { name: 'MERAH',  hex: '#E74C3C', textColor: '#fff' },
+  { name: 'BIRU',   hex: '#3498DB', textColor: '#fff' },
+  { name: 'KUNING', hex: '#F1C40F', textColor: '#333' },
+  { name: 'HIJAU',  hex: '#2ECC71', textColor: '#fff' },
+  { name: 'UNGU',   hex: '#9B59B6', textColor: '#fff' },
+  { name: 'JINGGA', hex: '#E67E22', textColor: '#fff' },
+  { name: 'PINK',   hex: '#FF69B4', textColor: '#fff' },
+  { name: 'COKLAT', hex: '#A0522D', textColor: '#fff' },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 7: UTILITY HELPERS
+═══════════════════════════════════════════════════════════════ */
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function getRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getLetterBg(letter) {
+  var map = {
+    A:'#FFE066',B:'#7EC8E3',C:'#FFB3D9',D:'#B5EAD7',E:'#FFCBA4',
+    F:'#C9B1FF',G:'#FFE066',H:'#7EC8E3',I:'#FFB3D9',J:'#B5EAD7',
+    K:'#FFCBA4',L:'#C9B1FF',M:'#FFE066',N:'#7EC8E3',O:'#FFB3D9',
+    P:'#B5EAD7',Q:'#FFCBA4',R:'#C9B1FF',S:'#FFE066',T:'#7EC8E3',
+    U:'#FFB3D9',V:'#B5EAD7',W:'#FFCBA4',X:'#C9B1FF',Y:'#FFE066',Z:'#7EC8E3'
+  };
+  return map[letter] || '#fff';
+}
+
+function getNumberBg(n) {
+  var cols = ['#FFE066','#7EC8E3','#FFB3D9','#B5EAD7','#FFCBA4','#C9B1FF'];
+  return cols[(n - 1) % cols.length];
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 8: QUESTION BUILDER
+═══════════════════════════════════════════════════════════════ */
+function buildQuestions(mode) {
+  var n = State.totalRounds;
+  if (mode === 'letters') {
+    return shuffle(LETTER_DATA).slice(0, n);
+  }
+  if (mode === 'numbers') {
+    return shuffle(NUMBER_DATA).slice(0, n);
+  }
+  if (mode === 'colors') {
+    var pool = shuffle(ALL_COLORS).slice(0, n);
+    return pool.map(function(target) {
+      var others = ALL_COLORS.filter(function(c) { return c.name !== target.name; });
+      var dist   = shuffle(others).slice(0, 2);
+      return { target: target, options: shuffle([target].concat(dist)) };
+    });
+  }
+  return [];
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 9: GAME FLOW
+═══════════════════════════════════════════════════════════════ */
+function startGame(mode) {
+  soundClick();
+  State.currentMode  = mode;
+  State.round        = 0;
+  State.sessionStars = 0;
+  State.answering    = true;
+  State.roundResults = [];
+  State.questions    = buildQuestions(mode);
+  showScreen('screenGame');
+  updateScoreBar();
+  buildProgressDots();
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (State.round >= State.totalRounds) {
+    endGame();
+    return;
+  }
+  State.currentQ  = State.questions[State.round];
+  State.answering = true;
+  renderQuestion();
+}
+
+function updateScoreBar() {
+  document.getElementById('scoreStars').textContent = '⭐ ' + State.sessionStars;
+  document.getElementById('scoreRound').textContent = (State.round + 1) + ' / ' + State.totalRounds;
+}
+
+function buildProgressDots() {
+  var dots = document.getElementById('progressDots');
+  dots.innerHTML = '';
+  for (var i = 0; i < State.totalRounds; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot';
+    d.id = 'dot-' + i;
+    dots.appendChild(d);
+  }
+}
+
+function markDot(index, correct) {
+  var d = document.getElementById('dot-' + index);
+  if (d) d.className = 'dot ' + (correct ? 'correct-dot' : 'done');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 10: RENDER QUESTION
+═══════════════════════════════════════════════════════════════ */
+var BOB_LETTER_SAYS  = ['HURUF APA INI?', 'CARI HURUF PERTAMANYA!', 'KLIK HURUF YANG BENAR YUK!'];
+var BOB_NUMBER_SAYS  = ['HITUNG YUK!', 'ADA BERAPA JUMLAHNYA?', 'KLIK ANGKA YANG TEPAT!'];
+var BOB_COLOR_SAYS   = ['CARI WARNANYA!', 'KLIK BALON YANG BENAR!'];
+
+function renderQuestion() {
+  updateScoreBar();
+  var choicesArea  = document.getElementById('choicesArea');
+  var qEmoji       = document.getElementById('qEmoji');
+  var qLabel       = document.getElementById('qLabel');
+  var qInstruction = document.getElementById('qInstruction');
+  var bobSays      = document.getElementById('bobSays');
+  choicesArea.innerHTML = '';
+  choicesArea.className = 'choices';  /* reset class each round */
+
+  var q = State.currentQ;
+
+  /* ── TEBAK HURUF ─────────────────────────────────────────────── */
+  if (State.currentMode === 'letters') {
+    bobSays.textContent      = getRandom(BOB_LETTER_SAYS);
+    qEmoji.textContent       = q.emoji;
+    qEmoji.style.fontSize    = 'clamp(72px, 20vw, 110px)';
+    qLabel.textContent       = q.label;
+    qInstruction.textContent = '👆 KLIK HURUF PERTAMA DARI ' + q.label;
+
+    shuffle(q.choices).forEach(function(letter) {
+      var btn = document.createElement('button');
+      btn.className   = 'choice-btn';
+      btn.textContent = letter;
+      btn.style.background = getLetterBg(letter);
+      btn.addEventListener('click', function() {
+        handleAnswer(letter === q.answer, btn, choicesArea);
+      });
+      choicesArea.appendChild(btn);
+    });
+  }
+
+  /* ── TEBAK ANGKA ─────────────────────────────────────────────── */
+  else if (State.currentMode === 'numbers') {
+    bobSays.textContent      = getRandom(BOB_NUMBER_SAYS);
+    var emojiStr = '';
+    for (var k = 0; k < q.count; k++) emojiStr += q.emoji + ' ';
+    qEmoji.textContent    = emojiStr.trim();
+    qEmoji.style.fontSize = q.count <= 3
+      ? 'clamp(56px, 15vw, 86px)'
+      : 'clamp(36px, 10vw, 58px)';
+    qLabel.textContent       = 'ADA BERAPA ' + q.label + '?';
+    qInstruction.textContent = '👆 KLIK ANGKANYA!';
+
+    shuffle(q.choices).forEach(function(num) {
+      var btn = document.createElement('button');
+      btn.className   = 'choice-btn';
+      btn.textContent = String(num);
+      btn.style.background = getNumberBg(num);
+      btn.addEventListener('click', function() {
+        handleAnswer(num === q.count, btn, choicesArea);
+      });
+      choicesArea.appendChild(btn);
+    });
+  }
+
+  /* ── TEBAK WARNA ─────────────────────────────────────────────── */
+  else if (State.currentMode === 'colors') {
+    var target = q.target;
+    bobSays.textContent      = 'KLIK BALON WARNA ' + target.name + '! 🎈';
+    qEmoji.textContent       = '🎈';
+    qEmoji.style.fontSize    = 'clamp(72px, 20vw, 100px)';
+    qLabel.textContent       = '';
+    qInstruction.textContent = '👆 CARI WARNA ' + target.name + '!';
+    choicesArea.className    = 'balloon-grid';
+
+    q.options.forEach(function(col) {
+      var btn = document.createElement('button');
+      btn.className = 'balloon-btn';
+      btn.style.background = col.hex;
+      btn.style.color      = col.textColor;
+      btn.setAttribute('aria-label', col.name);
+
+      var lbl = document.createElement('div');
+      lbl.textContent = col.name;
+      lbl.style.cssText = 'font-size:clamp(10px,2.8vw,13px);font-weight:900;letter-spacing:0.5px;pointer-events:none;';
+      btn.appendChild(lbl);
+
+      btn.addEventListener('click', function() {
+        handleAnswer(col.name === target.name, btn, choicesArea);
+      });
+      choicesArea.appendChild(btn);
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 11: ANSWER HANDLING
+═══════════════════════════════════════════════════════════════ */
+function handleAnswer(isCorrect, clickedBtn, choicesArea) {
+  if (!State.answering) return;
+  State.answering = false;
+  soundClick();
+
+  /* Disable all buttons immediately */
+  var allBtns = choicesArea.querySelectorAll('button');
+  allBtns.forEach(function(b) { b.disabled = true; });
+
+  if (isCorrect) {
+    clickedBtn.classList.add('correct');
+    State.sessionStars++;
+    State.totalStars++;
+    saveStars();
+    State.roundResults.push(true);
+    markDot(State.round, true);
+    soundCorrect();
+    setTimeout(launchConfetti, 150);
+    showFeedback(true);
+  } else {
+    clickedBtn.classList.add('wrong');
+    State.roundResults.push(false);
+    markDot(State.round, false);
+    soundWrong();
+    showFeedback(false);
+  }
+
+  State.round++;
+  var delay = isCorrect ? 2200 : 2000;
+  setTimeout(function() {
+    hideFeedback();
+    choicesArea.className = 'choices';
+    nextQuestion();
+  }, delay);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 12: FEEDBACK OVERLAY
+═══════════════════════════════════════════════════════════════ */
+var PRAISE_LIST = ['PINTAR SEKALI!','LUAR BIASA!','BAGUS BANGET!','HEBAT!','KEREN BANGET!','FANTASTIS!','SEMPURNA!'];
+var RETRY_LIST  = ['COBA LAGI YUK!','HAMPIR BENAR!','JANGAN MENYERAH!','YUKK COBA LAGI!'];
+
+function showFeedback(correct) {
+  var overlay = document.getElementById('feedbackOverlay');
+  var emoji   = document.getElementById('feedbackEmoji');
+  var text    = document.getElementById('feedbackText');
+  var sub     = document.getElementById('feedbackSub');
+
+  if (correct) {
+    emoji.textContent = getRandom(['🌟','🏆','🎉','✨','🥳']);
+    text.textContent  = getRandom(PRAISE_LIST);
+    sub.textContent   = '+1 ⭐ BINTANG!';
+    overlay.style.background = 'rgba(181,234,215,0.65)';
+  } else {
+    emoji.textContent = getRandom(['😊','💪','🤗','😄']);
+    text.textContent  = getRandom(RETRY_LIST);
+    sub.textContent   = 'KAU BISA! TETAP SEMANGAT! 💛';
+    overlay.style.background = 'rgba(255,255,180,0.65)';
+  }
+  overlay.classList.add('show');
+}
+
+function hideFeedback() {
+  document.getElementById('feedbackOverlay').classList.remove('show');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 13: END GAME SCREEN
+═══════════════════════════════════════════════════════════════ */
+function endGame() {
+  soundEnd();
+  launchConfetti();
+  var correct = State.roundResults.filter(function(r) { return r; }).length;
+  var starStr = '';
+  for (var i = 0; i < correct; i++) starStr += '⭐';
+
+  document.getElementById('endStars').textContent     = starStr || '🌟';
+  document.getElementById('endTotalStars').textContent = '⭐ TOTAL BINTANGKU: ' + State.totalStars;
+
+  var ratio = correct / State.totalRounds;
+  var msg;
+  if (ratio === 1)       msg = 'SEMPURNA! KAMU JENIUS! 🎉';
+  else if (ratio >= 0.6) msg = 'WOW! KAMU HEBAT BANGET! ⭐';
+  else                   msg = 'BAGUS! TERUS BERLATIH YA! 💪';
+  document.getElementById('endBubble').textContent = msg;
+
+  showScreen('screenEnd');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 14: EVENT LISTENERS
+═══════════════════════════════════════════════════════════════ */
+
+/* Start screen */
+document.getElementById('btnStart').addEventListener('click', function() {
+  soundClick();
+  loadStars();
+  showScreen('screenSelect');
+});
+
+/* Mode cards */
+document.getElementById('modeLetters').addEventListener('click', function() { startGame('letters'); });
+document.getElementById('modeNumbers').addEventListener('click', function() { startGame('numbers'); });
+document.getElementById('modeColors').addEventListener('click',  function() { startGame('colors');  });
+
+/* End screen buttons */
+document.getElementById('btnPlayAgain').addEventListener('click', function() {
+  soundClick();
+  startGame(State.currentMode);
+});
+
+document.getElementById('btnMenu').addEventListener('click', function() {
+  soundClick();
+  loadStars();
+  document.getElementById('startTotalStars').textContent = '⭐ TOTAL BINTANGKU: ' + State.totalStars;
+  showScreen('screenStart');
+});
+
+/* Back button */
+document.getElementById('backBtn').addEventListener('click', function() {
+  soundClick();
+  var active = document.querySelector('.screen.active');
+  if (!active) return;
+  if (active.id === 'screenGame' || active.id === 'screenEnd') {
+    showScreen('screenSelect');
+  } else if (active.id === 'screenSelect') {
+    loadStars();
+    document.getElementById('startTotalStars').textContent = '⭐ TOTAL BINTANGKU: ' + State.totalStars;
+    showScreen('screenStart');
+  }
+});
+
+/* Mute button */
+document.getElementById('muteBtn').addEventListener('click', function() {
+  State.muted = !State.muted;
+  document.getElementById('muteBtn').textContent = State.muted ? '🔇' : '🔊';
+});
+
+/* Resize confetti canvas */
+window.addEventListener('resize', function() {
+  confettiCanvas.width  = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 15: INIT
+═══════════════════════════════════════════════════════════════ */
+(function init() {
+  loadStars();
+  document.getElementById('startTotalStars').textContent = '⭐ TOTAL BINTANGKU: ' + State.totalStars;
+  confettiCanvas.width  = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+})();
+</script>
+</body>
+</html>
